@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Personál</title>
+    <style>
+        /* Obecné styly */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            font-family: Arial, sans-serif;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+        }
+
+        th {
+            background-color: #f4f4f4;
+            color: #333;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        tr:hover {
+            background-color: #f1f1f1;
+        }
+
+        /* Tlačítka */
+        button {
+            padding: 10px 20px;
+            margin: 10px 0;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        nav a {
+            text-decoration: none;
+            color: #007bff;
+            font-weight: bold;
+        }
+
+        nav a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <h1>Personál</h1>
+    <nav>
+        <a href="/">Zpět na hlavní nabídku</a>
+    </nav>
+    <h2>Seznam personálu</h2>
+    <form method="POST" action="/personnel">
+        <table>
+            <thead>
+                <tr>
+                    <th>Jméno</th>
+                    <th>Příjmení</th>
+                    <th>Datum narození</th>
+                    <th>V práci</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for person in personnel %}
+                <tr>
+                    <td>{{ person.name }}</td>
+                    <td>{{ person.surname }}</td>
+                    <td>{{ person.birth_date }}</td>
+                    <td>
+                        <input type="checkbox"
+                               name="working[]"
+                               value="{{ person.name }} {{ person.surname }}"
+                               {% if person.working %}checked{% endif %}
+                               onchange="updateWorkingStatus(this, '{{ person.name }} {{ person.surname }}')">
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </form>
+    <h2>Přidat nového člena</h2>
+    <form method="POST" action="/personnel">
+        <input type="text" name="name" placeholder="Jméno" required>
+        <input type="text" name="surname" placeholder="Příjmení" required>
+        <input type="date" name="birth_date" required>
+        <button type="submit">Přidat</button>
+    </form>
+    <script>
+        function updateWorkingStatus(checkbox, fullName) {
+            const working = checkbox.checked; // Zjištění, zda je checkbox zaškrtnutý
+            const xhr = new XMLHttpRequest(); // Vytvoření AJAX požadavku
+            xhr.open("POST", "/update_working_status", true);
+            xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+            xhr.send(JSON.stringify({ name: fullName, working: working }));
+        }
+    </script>
+</body>
+</html>
+

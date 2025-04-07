@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hlavní nabídka</title>
+    <style>
+        /* Obecné stylování */
+        body {
+            background-color: #f7f9fc; /* Světle modré pozadí */
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; /* Moderní bezpatkové písmo */
+            margin: 0;
+            padding: 0;
+        }
+
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-top: 10px;
+        }
+
+        nav {
+            display: flex;
+            justify-content: center; /* Zarovnání tlačítek na střed */
+            flex-wrap: wrap;
+            margin-top: 20px;
+        }
+
+        nav a {
+            margin: 10px;
+            padding: 15px 30px;
+            background: linear-gradient(135deg, #007bff, #0056b3); /* Modrý gradient */
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); /* Jemný stín */
+            transition: transform 0.2s ease-in-out, background 0.3s ease;
+            font-size: 16px; /* Větší písmo pro tlačítka */
+
+        }
+
+        nav a:hover {
+            background: linear-gradient(135deg, #0056b3, #003f7f); /* Tmavší modrý gradient při najetí myší */
+            transform: scale(1.05); /* Mírné zvětšení při najetí myší */
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 40px;
+            font-size: 14px;
+            color: #555;
+        }
+    </style>
+</head>
+<body>
+    <h1>Vítejte v hlavní nabídce</h1>
+    <h1>Break Listu</h1>
+    <nav>
+        <a href="/personnel">Personál</a>
+        <a href="/shifts">Směny</a>
+        <a href="/history">Historie směn</a>
+    </nav>
+    <footer>
+        <p>© 2025 Vaše aplikace</p>
+    </footer>
+</body>
+</html>
+

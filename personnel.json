@@ -1,0 +1,26 @@
+[
+    {
+        "name": "Marek",
+        "surname": "Adamec",
+        "birth_date": "1977-02-09",
+        "working": false
+    },
+    {
+        "name": "Michal",
+        "surname": "Pekhart",
+        "birth_date": "1972-09-17",
+        "working": false
+    },
+    {
+        "name": "Jana",
+        "surname": "Valehrachová",
+        "birth_date": "1980-03-30",
+        "working": false
+    },
+    {
+        "name": "Roman",
+        "surname": "Doležal",
+        "birth_date": "1977-02-03",
+        "working": false
+    }
+]
