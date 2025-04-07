@@ -1,9 +1,10 @@
 services:
   - type: web
-    name: breaklist
+    name: breaklist-app
     env: python
+    region: frankfurt
     buildCommand: ""
-    startCommand: python app.py
-    envVars:
-      - key: FLASK_ENV
-        value: development
+    startCommand: gunicorn app:app
+    plan: free
+    autoDeploy: true
+
