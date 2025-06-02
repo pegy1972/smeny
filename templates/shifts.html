@@ -56,7 +56,7 @@
 
         /* Ostatní selecty (ne Select2) */
         select:not(.select-person) {
-            width: 85px;
+            width: 100px;
             height: 40px;
             font-size: 18px;
             padding: 5px;
@@ -205,90 +205,88 @@
                         {% if shifts and shifts|length > person_index %}
                             {% for time_slot in range(36) %}
                             <td>
-                                <select name="shift_data[]">
+                                <select name="shift_data[]" onchange="updateShift({{ person_index }}, {{ time_slot }}, this.value)">
                                     <option value=""
                                     {% if shifts and shifts[person_index]["shifts"][time_slot]["status"] == "" %}selected{% endif %}>
-
                                     </option>
-                                    <option value="(R2)"
-                                            {% if shifts and shifts[person_index]["shifts"][time_slot]["status"] == "(R2)" %}selected{% endif %}>
-                                    (R2)
+                                    <option value="K - R2" {% if shifts and shifts[person_index]["shifts"][time_slot]["status"] == "K - R2" %}selected{% endif %}>
+                                    K - R2
                                     </option>
-                                    <option value="R2"
-                                    {% if shifts and shifts[person_index]["shifts"][time_slot]["status"] == "R2" %}selected{% endif %}>
-                                    R2
+                                    <option value="I - R2"
+                                    {% if shifts and shifts[person_index]["shifts"][time_slot]["status"] == "I - R2" %}selected{% endif %}>
+                                    I - R2
                                     </option>
-                                    <option value="(R1)"
-                                    {% if shifts and shifts[person_index]["shifts"][time_slot]["status"] == "(R1)" %}selected{% endif %}>
-                                    (R1)
+                                    <option value="K - R1"
+                                    {% if shifts and shifts[person_index]["shifts"][time_slot]["status"] == "K - R1" %}selected{% endif %}>
+                                    K - R1
                                     </option>
-                                    <option value="R1"
-                                    {% if shifts and shifts[person_index]["shifts"][time_slot]["status"] == "R1" %}selected{% endif %}>
-                                    R1
+                                    <option value="I - R1"
+                                    {% if shifts and shifts[person_index]["shifts"][time_slot]["status"] == "I - R1" %}selected{% endif %}>
+                                    I - R1
                                     </option>
-                                    <option value="(R3)"
-                                    {% if shifts and shifts[person_index]["shifts"][time_slot]["status"] == "(R3)" %}selected{% endif %}>
-                                    (R3)
+                                    <option value="K - R3"
+                                    {% if shifts and shifts[person_index]["shifts"][time_slot]["status"] == "K - R3" %}selected{% endif %}>
+                                    K - R3
                                     </option>
-                                    <option value="R3"
-                                    {% if shifts and shifts[person_index]["shifts"][time_slot]["status"] == "R3" %}selected{% endif %}>
-                                    R3
+                                    <option value="I - R3"
+                                    {% if shifts and shifts[person_index]["shifts"][time_slot]["status"] == "I - R3" %}selected{% endif %}>
+                                    I - R3
                                     </option>
-                                    <option value="(R4)"
-                                    {% if shifts and shifts[person_index]["shifts"][time_slot]["status"] == "(R4)" %}selected{% endif %}>
-                                    (R4)
+                                    <option value="K - R4"
+                                    {% if shifts and shifts[person_index]["shifts"][time_slot]["status"] == "K - R4" %}selected{% endif %}>
+                                    K - R4
                                     </option>
-                                    <option value="R4"
-                                    {% if shifts and shifts[person_index]["shifts"][time_slot]["status"] == "R4" %}selected{% endif %}>
-                                    R4
+                                    <option value="I - R4"
+                                    {% if shifts and shifts[person_index]["shifts"][time_slot]["status"] == "I - R4" %}selected{% endif %}>
+                                    I - R4
                                     </option>
-                                    <option value="(BJ1)"
-                                    {% if shifts and shifts[person_index]["shifts"][time_slot]["status"] == "(BJ1)" %}selected{% endif %}>
-                                    (BJ1)
+                                    <option value="K - BJ1"
+                                    {% if shifts and shifts[person_index]["shifts"][time_slot]["status"] == "K - BJ1" %}selected{% endif %}>
+                                    K - BJ1
                                     </option>
-                                    <option value="BJ1"
-                                    {% if shifts and shifts[person_index]["shifts"][time_slot]["status"] == "BJ1" %}selected{% endif %}>
-                                    BJ1
+                                    <option value="I - BJ1"
+                                    {% if shifts and shifts[person_index]["shifts"][time_slot]["status"] == "I - BJ1" %}selected{% endif %}>
+                                    I - BJ1
                                     </option>
-                                    <option value="(BJ2)"
-                                    {% if shifts and shifts[person_index]["shifts"][time_slot]["status"] == "(BJ2)" %}selected{% endif %}>
-                                    (BJ2)
+                                    <option value="K - BJ2"
+                                    {% if shifts and shifts[person_index]["shifts"][time_slot]["status"] == "K - BJ2" %}selected{% endif %}>
+                                    K - BJ2
                                     </option>
-                                    <option value="BJ2"
-                                    {% if shifts and shifts[person_index]["shifts"][time_slot]["status"] == "BJ2" %}selected{% endif %}>
-                                    BJ2
+                                    <option value="I - BJ2"
+                                    {% if shifts and shifts[person_index]["shifts"][time_slot]["status"] == "I - BJ2" %}selected{% endif %}>
+                                    I - BJ2
                                     </option>
-                                    <option value="(BJ3)"
-                                    {% if shifts and shifts[person_index]["shifts"][time_slot]["status"] == "(BJ3)" %}selected{% endif %}>
-                                    (BJ3)
+                                    <option value="K - BJ3"
+                                    {% if shifts and shifts[person_index]["shifts"][time_slot]["status"] == "K - BJ3" %}selected{% endif %}>
+                                    K - BJ3
                                     </option>
-                                    <option value="BJ3"
-                                    {% if shifts and shifts[person_index]["shifts"][time_slot]["status"] == "BJ3" %}selected{% endif %}>
-                                    BJ3
+                                    <option value="I - BJ3"
+                                    {% if shifts and shifts[person_index]["shifts"][time_slot]["status"] == "I - BJ3" %}selected{% endif %}>
+                                    I - BJ3
                                     </option>
-                                    <option value="(UT1)"
-                                    {% if shifts and shifts[person_index]["shifts"][time_slot]["status"] == "(UT1)" %}selected{% endif %}>
-                                    (UT1)
+                                    <option value="K - UT1"
+                                    {% if shifts and shifts[person_index]["shifts"][time_slot]["status"] == "K - UT1" %}selected{% endif %}>
+                                    K - UT1
                                     </option>
-                                    <option value="UT1"
-                                    {% if shifts and shifts[person_index]["shifts"][time_slot]["status"] == "UT1" %}selected{% endif %}>
-                                    UT1
+                                    <option value="I - UT1"
+                                    {% if shifts and shifts[person_index]["shifts"][time_slot]["status"] == "I - UT1" %}selected{% endif %}>
+                                    I - UT1
                                     </option>
-                                    <option value="(UT2)"
-                                    {% if shifts and shifts[person_index]["shifts"][time_slot]["status"] == "(UT2)" %}selected{% endif %}>
-                                    (UT2)
+                                    <option value="K - UT2"
+                                    {% if shifts and shifts[person_index]["shifts"][time_slot]["status"] == "K - UT2" %}selected{% endif %}>
+                                    K - UT2
                                     </option>
-                                    <option value="UT2"
-                                    {% if shifts and shifts[person_index]["shifts"][time_slot]["status"] == "UT2" %}selected{% endif %}>
-                                    UT2
+                                    <option value="I - UT2"
+                                    {% if shifts and shifts[person_index]["shifts"][time_slot]["status"] == "I - UT2" %}selected{% endif %}>
+                                    I - UT2
                                     </option>
-                                    <option value="(UT3)"
-                                    {% if shifts and shifts[person_index]["shifts"][time_slot]["status"] == "(UT3)" %}selected{% endif %}>
-                                    (UT3)
+                                    <option value="K - UT3"
+                                    {% if shifts and shifts[person_index]["shifts"][time_slot]["status"] == "K - UT3" %}selected{% endif %}>
+                                    K - UT3
                                     </option>
-                                    <option value="UT3"
-                                    {% if shifts and shifts[person_index]["shifts"][time_slot]["status"] == "UT3" %}selected{% endif %}>
-                                    UT3
+                                    <option value="I - UT3"
+                                    {% if shifts and shifts[person_index]["shifts"][time_slot]["status"] == "I - UT3" %}selected{% endif %}>
+                                    I - UT3
                                     </option>
                                     <option value="Poker"
                                     {% if shifts and shifts[person_index]["shifts"][time_slot]["status"] == "Poker" %}selected{% endif %}>
@@ -492,6 +490,26 @@
             }
         });
     </script>
+    <script>
+        function updateShift(row, slot, status) {
+            fetch('/update_shift', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: new URLSearchParams({
+                    row: row,
+                    slot: slot,
+                    status: status
+                })
+            }).then(response => {
+                if (!response.ok) {
+                    console.error("Chyba při ukládání změny.");
+                }
+            });
+        }
+    </script>
+
 </body>
 </html>
 

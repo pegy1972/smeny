@@ -16,13 +16,25 @@ if os.path.exists("personnel.json"):
 else:
     personnel = []
 
-shifts = []
-
 
 # Cesta k dočasnému souboru
 TEMP_FILE = "temp_categories.json"
 
 SHIFTS_DATA_PERSON = "shifts_data_person.json"
+
+SHIFTS_FILE = "shifts.json"
+
+
+def load_shifts():
+    if os.path.exists(SHIFTS_FILE):
+        with open(SHIFTS_FILE, "r", encoding="utf-8") as f:
+            return json.load(f)
+    return []
+
+
+def save_shifts_to_file(data):
+    with open(SHIFTS_FILE, "w", encoding="utf-8") as f:
+        json.dump(data, f, ensure_ascii=False, indent=4)
 
 
 def save_temp_data(temp_data):
@@ -58,7 +70,10 @@ def update_category():
 
 @app.route("/personnel", methods=["POST"])
 def update_personnel():
-    global personnel, shifts
+    global personnel
+
+    shifts = []
+
     new_person = {
         "name": request.form.get("name"),
         "surname": request.form.get("surname"),
@@ -70,6 +85,7 @@ def update_personnel():
     # Přidání prázdného záznamu do shifts pro nového zaměstnance
     new_shifts = {"shifts": [{"status": "neznámý"} for _ in range(36)]}
     shifts.append(new_shifts)
+    save_shifts_to_file(shifts)
 
     return redirect(url_for("personnel_menu"))
 
@@ -119,27 +135,19 @@ def personnel_menu():
 
 @app.route("/shifts", methods=["GET", "POST"])
 def shifts_menu():
-    global personnel, shifts
+    global personnel
 
     shifts_data_person = session.get("shifts_data_person", {})
 
     update_category()
-    # Synchronizace `shifts` s `personnel`
-    while len(shifts) < len(personnel):
-        new_shifts = {"shifts": [{"status": "neznámý"} for _ in range(36)]}
-        shifts.append(new_shifts)
 
-    while len(shifts) > len(personnel):
-        shifts.pop()
+    # Pracující osoby
+    working_personnel = [p for p in personnel if p.get("working", False)]
+    shift_data = request.form.getlist("shift_data[]")
 
-    # Filtrujeme zaměstnance, kteří jsou označeni jako "v práci"
-    working_personnel = [person for person in personnel if person.get("working", False)]
 
     if request.method == "POST":
-        shift_data = request.form.getlist("shift_data[]")
-        shifts = []
-
-        shifts_data_person = session.get("shifts_data_person", {})
+        smeny = []
         idx = 0
 
         # Seřadíme podle klíčů ve správném pořadí (row_id jako číslo)
@@ -147,52 +155,76 @@ def shifts_menu():
             name = shifts_data_person[row_id]
             person_shifts = {"name": name, "shifts": []}
             for time_slot in range(36):
+                status = shift_data[idx] if idx < len(shift_data) else ""
                 person_shifts["shifts"].append({
                     "time_slot": time_slot,
                     "status": shift_data[idx]
                 })
                 idx += 1
-            shifts.append(person_shifts)
+            smeny.append(person_shifts)
 
-    # Předávání dat do šablony - přidáme indexy osob
+        save_shifts_to_file(smeny)
+
+    # Pokud neproběhl POST, načti existující směny
+    else:
+        smeny = load_shifts()
+
+        if not smeny:
+            smeny = []
+            for person in working_personnel:
+                person_shifts = {
+                    "name": f"{person['name']} {person['surname']}",
+                    "shifts": [{"time_slot": i, "status": ""} for i in range(36)]
+                }
+                smeny.append(person_shifts)
+
     indexed_personnel = list(enumerate(working_personnel))
     temp_data = load_temp_data()
 
     return render_template("shifts.html", personnel=indexed_personnel, temp_data=temp_data,
-                           shifts=shifts, shifts_data_person=shifts_data_person,
+                           shifts=smeny, shifts_data_person=shifts_data_person,
                            working_personnel=working_personnel)
 
 
-@app.route("/assign_shift", methods=["POST"])
-def assign_shift():
-    selected_employee = request.form.get("selected_employee")
-    row_id = request.form.get("row_id")  # Přidáme identifikátor řádku
+@app.route("/update_shift", methods=["POST"])
+def update_shift():
+    shifts = load_shifts()
+    try:
+        row = int(request.form.get("row", "0"))
+        slot = int(request.form.get("slot", "0"))
+        status = request.form.get("status")
+    except ValueError:
+        return "Neplatné hodnoty", 400
 
-    if selected_employee and row_id is not None:
+    # Pokud směny neexistují, vytvoříme prázdnou strukturu
+    while len(shifts) <= row:
+        shifts.append({
+            "name": f"Osoba {row + 1}",
+            "shifts": [{"time_slot": i, "status": ""} for i in range(36)]
+        })
 
-        # Ulož do session (nebo do DB)
-        if "shifts_data_person" not in session:
-            session["shifts_data_person"] = {}
-        shifts_data = session["shifts_data_person"]
-        shifts_data[str(row_id)] = selected_employee
-        session["shifts_data_person"] = shifts_data
-    return redirect(url_for("shifts_menu"))
+    # Upravíme příslušný slot
+    shifts[row]["shifts"][slot]["status"] = status
+    save_shifts_to_file(shifts)
+
+    return "OK"
+
 
 
 @app.route("/save_shifts", methods=["POST"])
 def save_shifts():
-    global shifts
-    if shifts:  # Zkontrolujeme, zda existují data k uložení
+    smeny = load_shifts()
+    if smeny:  # Zkontrolujeme, zda existují data k uložení
         # Uložení směn do souboru
         with open(f"shifts_{datetime.now().strftime('%Y-%m-%d')}.json", "w", encoding="utf-8") as f:
-            json.dump(shifts, f, ensure_ascii=False, indent=4)
+            json.dump(smeny, f, ensure_ascii=False, indent=4)
 
         # Vymazání směn z paměti po jejich uložení
-        shifts = []
+        smeny = []
 
         # Po uložení vymažeme dočasný soubor
-        if os.path.exists(TEMP_FILE):
-            os.remove(TEMP_FILE)
+        if os.path.exists(SHIFTS_FILE):
+            os.remove(SHIFTS_FILE)
 
     return redirect(url_for("shifts_menu"))
 
