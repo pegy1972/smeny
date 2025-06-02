@@ -1,0 +1,20 @@
+[
+    {
+        "name": "Jana",
+        "surname": "Valehrachov\u00e1",
+        "birth_date": "1980-03-30",
+        "working": false
+    },
+    {
+        "name": "Michal",
+        "surname": "Pekhart",
+        "birth_date": "1972-09-17",
+        "working": true
+    },
+    {
+        "name": "Valerie",
+        "surname": "Volkov\u00e1",
+        "birth_date": "2002-02-14",
+        "working": true
+    }
+]

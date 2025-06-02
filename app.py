@@ -1,9 +1,12 @@
-from flask import Flask, render_template, request, redirect, url_for, jsonify
+from flask import Flask, render_template, request, redirect, url_for, jsonify, session
 import json
 from datetime import datetime
 import os
+import webbrowser
+import threading
 
 app = Flask(__name__)
+app.secret_key = "nějaký_dlouhý_náhodný_řetězec"  # <- Tohle přidej
 
 # Data structures
 # Načtení personálu ze souboru, pokud existuje
@@ -16,9 +19,41 @@ else:
 shifts = []
 
 
+# Cesta k dočasnému souboru
+TEMP_FILE = "temp_categories.json"
+
+SHIFTS_DATA_PERSON = "shifts_data_person.json"
+
+
+def save_temp_data(temp_data):
+    with open(TEMP_FILE, "w", encoding="utf-8") as file:
+        json.dump(temp_data, file, indent=4)
+
+
+def load_temp_data():
+    if os.path.exists(TEMP_FILE):
+        with open(TEMP_FILE, "r", encoding="utf-8") as file:
+            return json.load(file)
+    return {}
+
+
 @app.route("/")
 def main_menu():
     return render_template("index.html")
+
+
+@app.route("/update_category", methods=["POST"])
+def update_category():
+    temp_data = load_temp_data()  # Načtení dočasného souboru
+
+    name = request.form.get("name")
+    new_category = request.form.get("category")
+
+    if name and new_category is not None:
+        temp_data[name] = new_category  # Uložení dočasné hodnoty
+        save_temp_data(temp_data)  # Uložení zpět do souboru
+
+    return '', 204
 
 
 @app.route("/personnel", methods=["POST"])
@@ -77,9 +112,7 @@ def personnel_menu():
             birth_date = request.form["birth_date"]
             personnel.append({"name": name, "surname": surname, "birth_date": birth_date, "working": False})
 
-        # Uložení personálu do souboru (nepovinné)
-        with open("personnel.json", "w", encoding="utf-8") as f:
-            json.dump(personnel, f, ensure_ascii=False, indent=4)
+    save_personnel()
     return render_template("personnel.html", personnel=personnel)
 
 
@@ -88,6 +121,9 @@ def personnel_menu():
 def shifts_menu():
     global personnel, shifts
 
+    shifts_data_person = session.get("shifts_data_person", {})
+
+    update_category()
     # Synchronizace `shifts` s `personnel`
     while len(shifts) < len(personnel):
         new_shifts = {"shifts": [{"status": "neznámý"} for _ in range(36)]}
@@ -103,17 +139,44 @@ def shifts_menu():
         shift_data = request.form.getlist("shift_data[]")
         shifts = []
 
-        # Pro každého "pracujícího" zaměstnance uložíme směny
+        shifts_data_person = session.get("shifts_data_person", {})
         idx = 0
-        for person in working_personnel:
-            person_shifts = {"name": f"{person['name']} {person['surname']}", "shifts": []}
-            for time_slot in range(36):  # Pro každého zaměstnance projdeme jeho sloty
-                person_shifts["shifts"].append({"time_slot": time_slot, "status": shift_data[idx]})
+
+        # Seřadíme podle klíčů ve správném pořadí (row_id jako číslo)
+        for row_id in sorted(shifts_data_person.keys(), key=lambda x: int(x)):
+            name = shifts_data_person[row_id]
+            person_shifts = {"name": name, "shifts": []}
+            for time_slot in range(36):
+                person_shifts["shifts"].append({
+                    "time_slot": time_slot,
+                    "status": shift_data[idx]
+                })
                 idx += 1
             shifts.append(person_shifts)
+
     # Předávání dat do šablony - přidáme indexy osob
     indexed_personnel = list(enumerate(working_personnel))
-    return render_template("shifts.html", personnel=indexed_personnel, shifts=shifts)
+    temp_data = load_temp_data()
+
+    return render_template("shifts.html", personnel=indexed_personnel, temp_data=temp_data,
+                           shifts=shifts, shifts_data_person=shifts_data_person,
+                           working_personnel=working_personnel)
+
+
+@app.route("/assign_shift", methods=["POST"])
+def assign_shift():
+    selected_employee = request.form.get("selected_employee")
+    row_id = request.form.get("row_id")  # Přidáme identifikátor řádku
+
+    if selected_employee and row_id is not None:
+
+        # Ulož do session (nebo do DB)
+        if "shifts_data_person" not in session:
+            session["shifts_data_person"] = {}
+        shifts_data = session["shifts_data_person"]
+        shifts_data[str(row_id)] = selected_employee
+        session["shifts_data_person"] = shifts_data
+    return redirect(url_for("shifts_menu"))
 
 
 @app.route("/save_shifts", methods=["POST"])
@@ -121,25 +184,40 @@ def save_shifts():
     global shifts
     if shifts:  # Zkontrolujeme, zda existují data k uložení
         # Uložení směn do souboru
-        with open(f"shifts_{datetime.now().strftime('%Y-%m-%d')}.json", "w") as f:
+        with open(f"shifts_{datetime.now().strftime('%Y-%m-%d')}.json", "w", encoding="utf-8") as f:
             json.dump(shifts, f, ensure_ascii=False, indent=4)
 
         # Vymazání směn z paměti po jejich uložení
         shifts = []
+
+        # Po uložení vymažeme dočasný soubor
+        if os.path.exists(TEMP_FILE):
+            os.remove(TEMP_FILE)
+
     return redirect(url_for("shifts_menu"))
 
 
 @app.route("/history", methods=["GET", "POST"])
 def history_menu():
+    shifts_history = None
+    error = None
+    date = None
+
     if request.method == "POST":
-        date = request.form["date"]
-        try:
-            with open(f"shifts_{date}.json", "r") as f:
-                shifts_history = json.load(f)
-            return render_template("history.html", shifts_history=shifts_history)
-        except FileNotFoundError:
-            return render_template("history.html", error="File not found.")
-    return render_template("history.html")
+        date = request.form.get("date")
+
+        if not date:
+            error = "Datum musí být zadáno."
+        else:
+            file_path = f"shifts_{date}.json"
+            if os.path.exists(file_path):
+                with open(file_path, "r", encoding="utf-8") as f:
+                    shifts_history = json.load(f)
+            else:
+                error = "Soubor se směnami pro vybrané datum nebyl nalezen."
+
+
+    return render_template("history.html", shifts_history=shifts_history, error=error, request=request)
 
 
 @app.route("/update_working_status", methods=["POST"])
@@ -156,9 +234,72 @@ def update_working_status():
             break
 
     # Vracíme potvrzení
-    return jsonify({"status": "success"})
+    return {"status": "success"}
+
+
+def save_personnel():
+    with open("personnel.json", "w", encoding="utf-8") as file:
+        json.dump(personnel, file, indent=4)
+
+
+
+@app.route("/remove", methods=["POST"])
+def remove():
+    global personnel, shifts
+
+    full_name = request.form.get("person_name")
+    print(full_name)
+
+    if not full_name:
+        return "Chyba: Nebylo zadáno jméno zaměstnance", 400
+
+    # Ověření, zda zaměstnanec existuje
+    person_exists = any(person for person in personnel if f"{person['name']} {person['surname']}" == full_name)
+
+    if not person_exists:
+        return f"Chyba: Zaměstnanec '{full_name}' nebyl nalezen", 400
+
+    # Odstranění zaměstnance
+    personnel = [person for person in personnel if f"{person['name']} {person['surname']}" != full_name]
+    # shifts = [shift for shift in shifts if f"{shift['name']} {shift['surname']}" != full_name]
+
+    save_personnel()
+    return redirect(url_for("personnel_menu"))
+
+
+@app.route("/add_personnel", methods=["POST"])
+def add_personnel():
+    global personnel
+
+    name = request.form.get("name")
+    surname = request.form.get("surname")
+    birth_date = request.form.get("birth_date")
+
+    # Ověření duplicity
+    if any(person for person in personnel if person["name"] == name and person["surname"] == surname):
+        return f"Chyba: Zaměstnanec '{name} {surname}' už existuje", 400
+
+    new_person = {
+        "name": name,
+        "surname": surname,
+        "birth_date": birth_date,
+        "working": False
+    }
+    personnel.append(new_person)
+
+    return redirect(url_for("personnel_menu"))
+
+
+@app.route("/shutdown", methods=["POST"])
+def shutdown():
+    os._exit(0)  # tvrdé ukončení aplikace (funguje i v .exe)
+
+
+def run_app():
+    app.run(host="0.0.0.0", port=5000)
 
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000, debug=True)
+    threading.Timer(1.0, lambda: webbrowser.open("http://127.0.0.1:5000")).start()
+    run_app()
 

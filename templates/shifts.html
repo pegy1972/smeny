@@ -1,133 +1,165 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <!-- Select2 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <!-- Select2 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
     <title>Směny</title>
     <style>
+        /* Standardní světlý režim */
         body {
-            background-color: #f7f9fc; /* Světle modré pozadí */
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; /* Moderní bezpatkové písmo */
-            margin: 10;
-            padding: 10;
-        }
-        h1, h2 {
-           color: #333; /* Tmavý text */
-           text-align: center;
-           margin-top: 10px;
-        }
-
-        /* Obecné stylování tabulky */
-        table {
-            width: 2000px;
-            margin-top: 10px;
-            border-collapse: collapse;
+            background-color: white;
+            color: black;
             text-align: center;
-            font-family: Arial, sans-serif;
         }
 
-        th, td {
-            border: 4px solid #ddd;
-            padding: 10px;
-            min-width: 70px; /* Zajistí minimální šířku každého sloupce */
-            max-width: 120px; /* Zabrání příliš širokým sloupcům */
+        /* Moderní vzhled Select2 */
+        .select2-container--default .select2-selection--single {
+            background-color: #f9fafb;
+            border: 1px solid #d1d5db;
+            border-radius: 12px;
+            padding: 6px 12px;
+            height: 42px;
+            font-size: 20px;
+            color: #0E0E0E;
+            display: flex;
+            align-items: center;
         }
 
+        /* Hover a focus */
+        .select2-container--default .select2-selection--single:hover {
+            border-color: #60a5fa;
+        }
+        .select2-container--default.select2-container--focus .select2-selection--single {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+        }
+
+        /* Dropdown vzhled */
+        .select2-container--default .select2-results > .select2-results__options {
+            font-size: 16px;
+        }
+        .select2-container--default .select2-results__option--selected {
+            background-color: #3b82f6;
+            color: white;
+        }
+        .select2-container--default .select2-results__option--highlighted {
+            background-color: #60a5fa;
+            color: white;
+        }
+
+        /* Ostatní selecty (ne Select2) */
+        select:not(.select-person) {
+            width: 85px;
+            height: 40px;
+            font-size: 18px;
+            padding: 5px;
+            border-bottom: 3px solid #38b300;
+            border-left: 1px solid #ddd;
+            border-right: none;
+            border-top: none;
+            color: black;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #f9f9f9, #e3f2fd);
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s ease-in-out, background 0.4s ease;
+            cursor: pointer;
+        }
+        select:not(.select-person):hover {
+            background: linear-gradient(135deg, #e3f2fd, #bbdefb);
+            border-color: #38b300;
+            transform: scale(1.05);
+        }
+        select:not(.select-person):focus {
+            outline: none;
+            border-color: #0056b3;
+            box-shadow: 0px 4px 10px rgba(0, 85, 179, 0.3);
+        }
+
+        .table-container {
+            width: 100%;
+            overflow-x: auto; /* umožní horizontální scroll */
+            position: relative; /* nutné pro sticky */
+        }
+
+        /* Styl pro první sloupec */
+        td:first-child, th:first-child {
+            position: sticky;
+            left: 0;
+            z-index: 1;
+            background-color: white;
+            box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+        }
+
+        /* Buňka se jménem */
+        .name-cell {
+            width: 220px;
+            min-width: 220px;
+            max-width: 250px;
+            white-space: normal;
+            padding: 8px;
+            cursor: pointer;
+        }
+
+        /* Select uvnitř buňky */
+        .select-person {
+            width: 100%;
+            space: normal;
+        }
+        .row-C {
+            background-color: yellow !important; /* Světle žlutá */
+        }
+        .highlight-name-C {
+            background-color: yellow !important; /* Oranžové jméno */
+        }
+         .highlight {
+            background-color: Salmon !important; /* Zvýraznění sloupce žlutou barvou */
+
+        }
+        nav a {
+            display: inline-block;
+            text-decoration: none;
+            background-color: #e3f2fd;
+            padding: 8px 16px;
+            border-radius: 6px;
+            color: #007bff;
+            font-weight: bold;
+            margin-top: 50px;
+            margin-bottom: 20px;
+            transition: background-color 0.3s ease;
+        }
+
+        nav a:hover {
+            background-color: #bbdefb;
+        }
+        button {
+            background: linear-gradient(135deg, #007bff, #0056b3);
+            padding: 10px 30px;
+            margin: 20px 15px;
+            color: white;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+
+        button:hover {
+            transform: scale(1.05);
+        }
         th {
+            border-bottom: 4px solid #ccc;
+            padding: 10px;
+            min-width: 70px;
+            max-width: 120px;
             background-color: #f4f4f4;
             color: #333;
         }
 
-        tr:nth-child(even) {
-            background-color: #f9f9f9;
-        }
-
-        tr:hover {
-            background-color: #f1f1f1;
-        }
-
-        select {
-            width: 90px; /* Nastaví šířku rozevíracího seznamu */
-            height: 35px; /* Nastaví výšku seznamu */
-            font-size: 18px; /* Zvětší písmo */
-            padding: 5px; /* Přidá vnitřní okraje */
-            border: 2px solid #007bff; /* Přidá jemný rámeček */
-            border-radius: 10px; /* Zaoblení rohů */
-            background: linear-gradient(135deg, #f9f9f9, #e3f2fd); /* Barevný gradient */
-            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); /* Jemný stín */
-            transition: transform 0.2s ease-in-out, background 0.3s ease; /* Animace při interakci */
-            cursor: pointer; /* Změna kurzoru na ukazatel */
-        }
-
-        select:hover {
-            background: linear-gradient(135deg, #e3f2fd, #bbdefb); /* Změna barvy při najetí myší */
-            border-color: #0056b3; /* Tmavší modrá barva rámečku */
-            transform: scale(1.05); /* Mírné zvětšení při najetí myší */
-        }
-
-        select:focus {
-            outline: none; /* Odstranění obrysu při kliknutí */
-            border-color: #0056b3; /* Zvýrazněný rámeček při zaostření */
-            box-shadow: 0px 4px 10px rgba(0, 85, 179, 0.3); /* Zvýšený stín při interakci */
-        }
-
-        /* Ukotvení prvního sloupce */
-        td:first-child, th:first-child {
-            position: sticky;
-            left: 0;
-            background-color: #f4f4f4; /* Zachování barvy ukotveného sloupce */
-            z-index: 1; /* Aby sloupec zůstal nad ostatními buňkami při posouvání */
-        }
-
-        /* Posouvání tabulky */
-        .table-container {
-            overflow-x: auto; /* Povolit horizontální posouvání */
-            width: 100%;
-        }
-
-        /* Tlačítka */
-        button {
-            background: linear-gradient(135deg, #007bff, #0056b3);
-            padding: 10px 20px;
-            margin-top: 20px;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); /* Jemný stín */
-            transition: background 0.3s ease;
-        }
-
-        button:hover {
-            background-color: linear-gradient(135deg, #0056b3, #003f7f);
-            transform: scale(1.05); /* Mírné zvětšení při najetí myší */
-        }
-
-        nav a {
-            text-decoration: none;
-            color: #007bff;
-            font-weight: bold;
-            margin-right: 5px;
-            padding: 5px;
-            margin-bottom: 30px; /* Přidá prostor mezi odkazem a tabulkou */
-            display: inline-block; /* Zajistí, že margin-bottom bude fungovat správně */
-        }
-
-        nav a:hover {
-            text-decoration: underline;
-            margin: 10px;
-            padding: 10px;
-        }
-
-        .highlight {
-            background-color: Salmon !important; /* Zvýraznění sloupce žlutou barvou */
-
-        }
-
-        .table-container {
-            overflow-x: flex;
-            border: 1px solid #ddd; /* Rámeček kolem posouvatelné tabulky */
-            border-radius: 5px;
-            justify-content: center; /* Tabulka je zarovnána na střed */
-        }
     </style>
 </head>
 <body>
@@ -138,132 +170,153 @@
     <form method="POST" action="/shifts">
         <!-- Obalíme tabulku divem pro posouvání -->
         <div class="table-container">
-            <table id="shiftsTable">
-                <tr>
-                    <th>Jméno</th>
-                    {% for time in range(36) %}
-                    <th id="time-{{ time }}">
-                        {{ (16 + (time * 20) // 60) % 24 }}:{{'{:02}'.format((time * 20) % 60) }}
-                    </th>
-                    {% endfor %}
-                </tr>
-                {% for person_index, person in personnel %}
-                <tr>
-                    <td>{{ person.name }} {{ person.surname }}</td>
-                    {% if shifts and shifts|length > person_index %}
-                        {% for time_slot in range(36) %}
-                        <td>
-                            <select name="shift_data[]">
-                                <option value=""
-                                {% if shifts and shifts[person_index]["shifts"][time_slot]["status"] == "" %}selected{% endif %}>
-
-                                </option>
-                                <option value="(R2)"
-                                        {% if shifts and shifts[person_index]["shifts"][time_slot]["status"] == "(R2)" %}selected{% endif %}>
-                                (R2)
-                                </option>
-                                <option value="R2"
-                                {% if shifts and shifts[person_index]["shifts"][time_slot]["status"] == "R2" %}selected{% endif %}>
-                                R2
-                                </option>
-                                <option value="(R1)"
-                                {% if shifts and shifts[person_index]["shifts"][time_slot]["status"] == "(R1)" %}selected{% endif %}>
-                                (R1)
-                                </option>
-                                <option value="R1"
-                                {% if shifts and shifts[person_index]["shifts"][time_slot]["status"] == "R1" %}selected{% endif %}>
-                                R1
-                                </option>
-                                <option value="(R3)"
-                                {% if shifts and shifts[person_index]["shifts"][time_slot]["status"] == "(R3)" %}selected{% endif %}>
-                                (R3)
-                                </option>
-                                <option value="R3"
-                                {% if shifts and shifts[person_index]["shifts"][time_slot]["status"] == "R3" %}selected{% endif %}>
-                                R3
-                                </option>
-                                <option value="(R4)"
-                                {% if shifts and shifts[person_index]["shifts"][time_slot]["status"] == "(R4)" %}selected{% endif %}>
-                                (R4)
-                                </option>
-                                <option value="R4"
-                                {% if shifts and shifts[person_index]["shifts"][time_slot]["status"] == "R4" %}selected{% endif %}>
-                                R4
-                                </option>
-                                <option value="(BJ1)"
-                                {% if shifts and shifts[person_index]["shifts"][time_slot]["status"] == "(BJ1)" %}selected{% endif %}>
-                                (BJ1)
-                                </option>
-                                <option value="BJ1"
-                                {% if shifts and shifts[person_index]["shifts"][time_slot]["status"] == "BJ1" %}selected{% endif %}>
-                                BJ1
-                                </option>
-                                <option value="(BJ2)"
-                                {% if shifts and shifts[person_index]["shifts"][time_slot]["status"] == "(BJ2)" %}selected{% endif %}>
-                                (BJ2)
-                                </option>
-                                <option value="BJ2"
-                                {% if shifts and shifts[person_index]["shifts"][time_slot]["status"] == "BJ2" %}selected{% endif %}>
-                                BJ2
-                                </option>
-                                <option value="(BJ3)"
-                                {% if shifts and shifts[person_index]["shifts"][time_slot]["status"] == "(BJ3)" %}selected{% endif %}>
-                                (BJ3)
-                                </option>
-                                <option value="BJ3"
-                                {% if shifts and shifts[person_index]["shifts"][time_slot]["status"] == "BJ3" %}selected{% endif %}>
-                                BJ3
-                                </option>
-                                <option value="(UT1)"
-                                {% if shifts and shifts[person_index]["shifts"][time_slot]["status"] == "(UT1)" %}selected{% endif %}>
-                                (UT1)
-                                </option>
-                                <option value="UT1"
-                                {% if shifts and shifts[person_index]["shifts"][time_slot]["status"] == "UT1" %}selected{% endif %}>
-                                UT1
-                                </option>
-                                <option value="(UT2)"
-                                {% if shifts and shifts[person_index]["shifts"][time_slot]["status"] == "(UT2)" %}selected{% endif %}>
-                                (UT2)
-                                </option>
-                                <option value="UT2"
-                                {% if shifts and shifts[person_index]["shifts"][time_slot]["status"] == "UT2" %}selected{% endif %}>
-                                UT2
-                                </option>
-                                <option value="(UT3)"
-                                {% if shifts and shifts[person_index]["shifts"][time_slot]["status"] == "(UT3)" %}selected{% endif %}>
-                                (UT3)
-                                </option>
-                                <option value="UT3"
-                                {% if shifts and shifts[person_index]["shifts"][time_slot]["status"] == "UT3" %}selected{% endif %}>
-                                UT3
-                                </option>
-                                <option value="Poker"
-                                {% if shifts and shifts[person_index]["shifts"][time_slot]["status"] == "Poker" %}selected{% endif %}>
-                                Poker
-                                </option>
-                                <option value="C"
-                                {% if shifts and shifts[person_index]["shifts"][time_slot]["status"] == "C" %}selected{% endif %}>
-                                C
-                                </option>
-                                <option value="XXX"
-                                {% if shifts and shifts[person_index]["shifts"][time_slot]["status"] == "XXX" %}selected{% endif %}>
-                                XXX
-                                </option>
+            <table id="shiftsTable" class="styled-table">
+                <thead>
+                    <tr>
+                        <th>  </th>
+                        <th>Stav</th>
+                        {% for time in range(36) %}
+                        <th id="time-{{ time }}">
+                            {{ (16 + (time * 20) // 60) % 24 }}:{{'{:02}'.format((time * 20) % 60) }}
+                        </th>
+                        {% endfor %}
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for person_index, person in personnel %}
+                    <tr>
+                        <td class="name-cell">
+                            <select name="selected_employee_{{ person_index }}" class="select-person" onchange="submitEmployeeChange({{ person_index }})">
+                                <option value="">-- Vyber osobu --</option>
+                                {% for person in working_personnel %}
+                                    <option value="{{ person.name }} {{ person.surname }}"
+                                            {% if shifts_data_person.get(person_index|string) == person.name ~ ' ' ~ person.surname %}selected{% endif %}>
+                                       {{ person.name }}  {{ person.surname }}
+                                    </option>
+                                {% endfor %}
                             </select>
                         </td>
-                        {% endfor %}
-                    {% else %}
-                        <td colspan="36">Žádné údaje o směnách</td>
-                    {% endif %}
-                </tr>
-                {% endfor %}
+                        <td>
+                            <select name="category" class="category" onchange="updateCategory('{{ person.name }}', this.value)">
+                                <option value="" {% if temp_data.get(person.name) =="" %}selected{% endif %}></option>
+                                <option value="C" {% if temp_data.get(person.name) =="C" %}selected{% endif %}>C</option>
+                            </select>
+                        </td>
+                        {% if shifts and shifts|length > person_index %}
+                            {% for time_slot in range(36) %}
+                            <td>
+                                <select name="shift_data[]">
+                                    <option value=""
+                                    {% if shifts and shifts[person_index]["shifts"][time_slot]["status"] == "" %}selected{% endif %}>
+
+                                    </option>
+                                    <option value="(R2)"
+                                            {% if shifts and shifts[person_index]["shifts"][time_slot]["status"] == "(R2)" %}selected{% endif %}>
+                                    (R2)
+                                    </option>
+                                    <option value="R2"
+                                    {% if shifts and shifts[person_index]["shifts"][time_slot]["status"] == "R2" %}selected{% endif %}>
+                                    R2
+                                    </option>
+                                    <option value="(R1)"
+                                    {% if shifts and shifts[person_index]["shifts"][time_slot]["status"] == "(R1)" %}selected{% endif %}>
+                                    (R1)
+                                    </option>
+                                    <option value="R1"
+                                    {% if shifts and shifts[person_index]["shifts"][time_slot]["status"] == "R1" %}selected{% endif %}>
+                                    R1
+                                    </option>
+                                    <option value="(R3)"
+                                    {% if shifts and shifts[person_index]["shifts"][time_slot]["status"] == "(R3)" %}selected{% endif %}>
+                                    (R3)
+                                    </option>
+                                    <option value="R3"
+                                    {% if shifts and shifts[person_index]["shifts"][time_slot]["status"] == "R3" %}selected{% endif %}>
+                                    R3
+                                    </option>
+                                    <option value="(R4)"
+                                    {% if shifts and shifts[person_index]["shifts"][time_slot]["status"] == "(R4)" %}selected{% endif %}>
+                                    (R4)
+                                    </option>
+                                    <option value="R4"
+                                    {% if shifts and shifts[person_index]["shifts"][time_slot]["status"] == "R4" %}selected{% endif %}>
+                                    R4
+                                    </option>
+                                    <option value="(BJ1)"
+                                    {% if shifts and shifts[person_index]["shifts"][time_slot]["status"] == "(BJ1)" %}selected{% endif %}>
+                                    (BJ1)
+                                    </option>
+                                    <option value="BJ1"
+                                    {% if shifts and shifts[person_index]["shifts"][time_slot]["status"] == "BJ1" %}selected{% endif %}>
+                                    BJ1
+                                    </option>
+                                    <option value="(BJ2)"
+                                    {% if shifts and shifts[person_index]["shifts"][time_slot]["status"] == "(BJ2)" %}selected{% endif %}>
+                                    (BJ2)
+                                    </option>
+                                    <option value="BJ2"
+                                    {% if shifts and shifts[person_index]["shifts"][time_slot]["status"] == "BJ2" %}selected{% endif %}>
+                                    BJ2
+                                    </option>
+                                    <option value="(BJ3)"
+                                    {% if shifts and shifts[person_index]["shifts"][time_slot]["status"] == "(BJ3)" %}selected{% endif %}>
+                                    (BJ3)
+                                    </option>
+                                    <option value="BJ3"
+                                    {% if shifts and shifts[person_index]["shifts"][time_slot]["status"] == "BJ3" %}selected{% endif %}>
+                                    BJ3
+                                    </option>
+                                    <option value="(UT1)"
+                                    {% if shifts and shifts[person_index]["shifts"][time_slot]["status"] == "(UT1)" %}selected{% endif %}>
+                                    (UT1)
+                                    </option>
+                                    <option value="UT1"
+                                    {% if shifts and shifts[person_index]["shifts"][time_slot]["status"] == "UT1" %}selected{% endif %}>
+                                    UT1
+                                    </option>
+                                    <option value="(UT2)"
+                                    {% if shifts and shifts[person_index]["shifts"][time_slot]["status"] == "(UT2)" %}selected{% endif %}>
+                                    (UT2)
+                                    </option>
+                                    <option value="UT2"
+                                    {% if shifts and shifts[person_index]["shifts"][time_slot]["status"] == "UT2" %}selected{% endif %}>
+                                    UT2
+                                    </option>
+                                    <option value="(UT3)"
+                                    {% if shifts and shifts[person_index]["shifts"][time_slot]["status"] == "(UT3)" %}selected{% endif %}>
+                                    (UT3)
+                                    </option>
+                                    <option value="UT3"
+                                    {% if shifts and shifts[person_index]["shifts"][time_slot]["status"] == "UT3" %}selected{% endif %}>
+                                    UT3
+                                    </option>
+                                    <option value="Poker"
+                                    {% if shifts and shifts[person_index]["shifts"][time_slot]["status"] == "Poker" %}selected{% endif %}>
+                                    Poker
+                                    </option>
+                                    <option value="C"
+                                    {% if shifts and shifts[person_index]["shifts"][time_slot]["status"] == "C" %}selected{% endif %}>
+                                    C
+                                    </option>
+                                    <option value="XXX"
+                                    {% if shifts and shifts[person_index]["shifts"][time_slot]["status"] == "XXX" %}selected{% endif %}>
+                                    XXX
+                                    </option>
+                                </select>
+                            </td>
+                            {% endfor %}
+                        {% else %}
+                            <td colspan="36">Žádné údaje o směnách</td>
+                        {% endif %}
+                    </tr>
+                    {% endfor %}
+                </tbody>
             </table>
         </div>
-        <button type="submit">Uložit směny</button>
     </form>
+
     <form method="POST" action="/save_shifts">
-        <button type="submit">Uložit směny historie</button>
+        <button type="submit">Uložit směny</button>
     </form>
 
     <!-- JavaScript pro zvýraznění aktuálního času -->
@@ -308,7 +361,7 @@
         }
 
         table.querySelectorAll("tr").forEach(row => {
-            const cell = row.cells[timeSlotIndex + 1]; // +1 kvůli prvnímu sloupci (jméno)
+            const cell = row.cells[timeSlotIndex + 2]; // +1 kvůli prvnímu sloupci (jméno)
             if (cell) cell.classList.add("highlight");
         });
     } else {
@@ -320,6 +373,7 @@
     highlightCurrentTime();
     setInterval(highlightCurrentTime, 60000);
     </script>
+
     <script>
         window.addEventListener("beforeunload", function (event) {
            // Najdeme formulář směn
@@ -332,6 +386,111 @@
                navigator.sendBeacon("/shifts", new URLSearchParams(formData));
            }
        });
+    </script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            console.log("✅ JavaScript je načten!"); // Ověření načtení skriptu
+
+            const rows = document.querySelectorAll("#shiftsTable tbody tr");
+
+            rows.forEach(row => {
+                const categorySelect = row.querySelector(".category");
+                const nameCell = row.querySelector(".name-cell");
+
+                function updateColors() {
+                    const category = categorySelect.value;
+                    console.log(`🎨 Změna: ${category}`); // Ověření výběru hodnoty
+
+                    // Nejprve odstraníme všechny barvy
+                    row.classList.remove("row-C", "row-O");
+                    nameCell.classList.remove("highlight-name-C", "highlight-name-O");
+
+                    // Přidáme odpovídající barvu
+                    if (category) {
+                        row.classList.add(`row-${category}`);
+                        nameCell.classList.add(`highlight-name-${category}`);
+                    }
+                }
+
+                // Inicializujeme barvy při načtení stránky
+                updateColors();
+
+                // Při změně hodnoty v selectu okamžitě aktualizujeme barvu
+                categorySelect.addEventListener("change", updateColors);
+            });
+        });
+    </script>
+    <script>
+        function updateCategory(name, category) {
+            fetch('/update_category', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: new URLSearchParams({
+                    name: name,
+                    category: category
+                })
+            })
+            .then(response => response.text())
+            .then(data => {
+                console.log('Kategorie aktualizována:', data);
+            });
+        }
+    </script>
+    <script>
+        function submitEmployeeChange(index) {
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = '/assign_shift';
+
+            const rowInput = document.createElement('input');
+            rowInput.type = 'hidden';
+            rowInput.name = 'row_id';
+            rowInput.value = index;
+            form.appendChild(rowInput);
+
+            const select = document.querySelector(`select[name="selected_employee_${index}"]`);
+            const selected = document.createElement('input');
+            selected.type = 'hidden';
+            selected.name = 'selected_employee';
+            selected.value = select.value;
+            form.appendChild(selected);
+
+            document.body.appendChild(form);
+            form.submit();
+        }
+    </script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            $('.select-person').select2({
+                placeholder: "-- Vyber osobu --",
+                dropdownAutoWidth: true,
+                width: 'style',
+                minimumResultsForSearch: Infinity // schovat vyhledávání, pokud není potřeba
+            });
+        });
+    </script>
+    <script>
+        $(document).ready(function() {
+            $('.select-person').select2({
+                width: 'resolve' // Select2 si správně vezme šířku rodiče (buňky)
+            });
+        });
+    </script>
+    <script>
+        function toggleDarkMode() {
+            document.body.classList.toggle("dark-mode");
+            localStorage.setItem("darkMode", document.body.classList.contains("dark-mode"));
+        }
+
+        // Při načtení stránky nastavíme režim podle uložené hodnoty
+        document.addEventListener("DOMContentLoaded", () => {
+            if (localStorage.getItem("darkMode") === "true") {
+                document.body.classList.add("dark-mode");
+            }
+        });
     </script>
 </body>
 </html>
