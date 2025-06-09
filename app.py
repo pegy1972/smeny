@@ -158,7 +158,7 @@ def shifts_menu():
                 status = shift_data[idx] if idx < len(shift_data) else ""
                 person_shifts["shifts"].append({
                     "time_slot": time_slot,
-                    "status": shift_data[idx]
+                    "status": status
                 })
                 idx += 1
             smeny.append(person_shifts)
@@ -267,6 +267,23 @@ def update_working_status():
 
     # Vracíme potvrzení
     return {"status": "success"}
+
+
+
+@app.route("/assign_shift", methods=["POST"])
+def assign_shift():
+    row_id = int(request.form.get("row_id"))
+    selected_employee = request.form.get("selected_employee")
+
+    # Ulož do session (nebo do DB)
+    if "shifts_data_person" not in session:
+        session["shifts_data_person"] = {}
+    shifts_data = session["shifts_data_person"]
+    shifts_data[str(row_id)] = selected_employee
+    session["shifts_data_person"] = shifts_data
+
+    return redirect("/shifts")
+
 
 
 def save_personnel():

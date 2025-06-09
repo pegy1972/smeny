@@ -1,18 +1,18 @@
 [
     {
-        "name": "Michal Pekhart",
+        "name": "Jana Valehrachová",
         "shifts": [
             {
                 "time_slot": 0,
-                "status": "K - UT3"
+                "status": ""
             },
             {
                 "time_slot": 1,
-                "status": "I - BJ1"
+                "status": ""
             },
             {
                 "time_slot": 2,
-                "status": "K - BJ2"
+                "status": ""
             },
             {
                 "time_slot": 3,
@@ -149,7 +149,156 @@
         ]
     },
     {
-        "name": "Valerie Volková",
+        "name": "Michal Pekhart",
+        "shifts": [
+            {
+                "time_slot": 0,
+                "status": ""
+            },
+            {
+                "time_slot": 1,
+                "status": ""
+            },
+            {
+                "time_slot": 2,
+                "status": ""
+            },
+            {
+                "time_slot": 3,
+                "status": ""
+            },
+            {
+                "time_slot": 4,
+                "status": ""
+            },
+            {
+                "time_slot": 5,
+                "status": ""
+            },
+            {
+                "time_slot": 6,
+                "status": ""
+            },
+            {
+                "time_slot": 7,
+                "status": ""
+            },
+            {
+                "time_slot": 8,
+                "status": ""
+            },
+            {
+                "time_slot": 9,
+                "status": ""
+            },
+            {
+                "time_slot": 10,
+                "status": ""
+            },
+            {
+                "time_slot": 11,
+                "status": ""
+            },
+            {
+                "time_slot": 12,
+                "status": ""
+            },
+            {
+                "time_slot": 13,
+                "status": ""
+            },
+            {
+                "time_slot": 14,
+                "status": ""
+            },
+            {
+                "time_slot": 15,
+                "status": ""
+            },
+            {
+                "time_slot": 16,
+                "status": ""
+            },
+            {
+                "time_slot": 17,
+                "status": ""
+            },
+            {
+                "time_slot": 18,
+                "status": ""
+            },
+            {
+                "time_slot": 19,
+                "status": ""
+            },
+            {
+                "time_slot": 20,
+                "status": ""
+            },
+            {
+                "time_slot": 21,
+                "status": ""
+            },
+            {
+                "time_slot": 22,
+                "status": ""
+            },
+            {
+                "time_slot": 23,
+                "status": ""
+            },
+            {
+                "time_slot": 24,
+                "status": ""
+            },
+            {
+                "time_slot": 25,
+                "status": ""
+            },
+            {
+                "time_slot": 26,
+                "status": ""
+            },
+            {
+                "time_slot": 27,
+                "status": ""
+            },
+            {
+                "time_slot": 28,
+                "status": ""
+            },
+            {
+                "time_slot": 29,
+                "status": ""
+            },
+            {
+                "time_slot": 30,
+                "status": ""
+            },
+            {
+                "time_slot": 31,
+                "status": ""
+            },
+            {
+                "time_slot": 32,
+                "status": ""
+            },
+            {
+                "time_slot": 33,
+                "status": ""
+            },
+            {
+                "time_slot": 34,
+                "status": ""
+            },
+            {
+                "time_slot": 35,
+                "status": ""
+            }
+        ]
+    },
+    {
+        "name": "Michal Pekhart",
         "shifts": [
             {
                 "time_slot": 0,
